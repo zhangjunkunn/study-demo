@@ -102,6 +102,7 @@ class Game {
       this.refreshDiv(this.gameDivs, this.gameData);
     }
   }
+
   fixed() {
     this.gameController.fixed(this.cur, this.gameData);
     this.refreshDiv(this.gameDivs, this.gameData);
@@ -150,28 +151,31 @@ class Game {
     this.timer = null;
     console.log('game over')
   }
+  // 刷新当前方块和下一个方块
   performNext() {
+    this.gameController.clearData(this.cur, this.gameData)
     this.cur = this.next || this.squareFactory.makeSquare();
     this.next = this.squareFactory.makeSquare();
 
     this.gameController.initRotate(this.cur, this.next, this.gameData);
     this.gameController.setData(this.cur, this.gameData);
 
-    // this.refreshDiv(this.gameDivs, this.gameData);
-    // this.refreshDiv(this.nextDivs, this.next.data);
+    this.refreshDiv(this.gameDivs, this.gameData);
+    this.refreshDiv(this.nextDivs, this.next.data);
   }
   // 游戏初始化
   init(doms) {
     this.squareFactory = new SquareFactory();
     this.gameController = new GameController();
 
-    this.performNext()
+    // this.performNext();
+    this.cur = this.squareFactory.makeSquare();
+    this.next = this.squareFactory.makeSquare();
 
     this.initDiv(this.gameDivs, this.gameData, doms.gameDiv);
     this.initDiv(this.nextDivs, this.next.data, doms.nextDiv);
 
-    this.refreshDiv(this.gameDivs, this.gameData);
-    this.refreshDiv(this.nextDivs, this.next.data);
+    this.performNext();
 
     this.timer = setInterval(() => {
       this.autoRun();

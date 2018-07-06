@@ -137,6 +137,9 @@ class GameController {
       }
     }
   }
+  clearData(cur, gameData) {
+    clearData(cur, gameData)
+  }
   setData(cur, gameData) {
     for (let i = 0; i < cur.data.length; i++) {
       for (let j = 0; j < cur.data[i].length; j++) {
