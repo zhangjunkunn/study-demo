@@ -1,5 +1,7 @@
 import GameController from './gameController.js'
 import SquareFactory from './squareFactory.js'
+
+
 class Game {
   constructor() {
     this.gameData = [
@@ -31,6 +33,10 @@ class Game {
     this.gameController = null;
     this.squareFactory = null;
     this.timer = null;
+    this.timeDiv = null;
+    this.scoreDiv = null;
+    this.timeCount = 0;
+    this.score = 0;
   }
   // 初始化div
   initDiv(divs, data, container) {
@@ -102,16 +108,20 @@ class Game {
       this.refreshDiv(this.gameDivs, this.gameData);
     }
   }
-
+  // 固定方块
   fixed() {
     this.gameController.fixed(this.cur, this.gameData);
     this.refreshDiv(this.gameDivs, this.gameData);
   }
+
   autoRun() {
+    let scoreCount;
     if(!this.down()) {
       this.fixed();
-      this.checkClear();
-      console.log(this.checkGameOver())
+      scoreCount = this.checkClear();
+      if(scoreCount != 0) {
+        this.setScore(scoreCount);
+      }
       if(this.checkGameOver()) {
         this.stop();
       } else {
@@ -119,13 +129,16 @@ class Game {
       }
     }
   }
+  // 检查是否可以消行
   checkClear() {
+    let clearCount = 0;
     for(let i = this.gameData.length - 1; i >= 0; i --) {
       let clean = true;
       for(let j = this.gameData[i].length - 1; j >= 0; j --) {
         if(this.gameData[i][j] != 1) clean = false;
       }
       if(clean) {
+        clearCount ++;
         for(let t = i; t > 0; t --) {
           for(let j = 0; j < this.gameData[t].length; j ++) {
             this.gameData[t][j] = this.gameData[t - 1][j];
@@ -137,7 +150,9 @@ class Game {
         i++;
       }
     }
+    return clearCount;
   }
+  // 检查游戏是否结束
   checkGameOver() {
     for(let j = 0; j < this.gameData[0].length; j ++) {
       if(this.gameData[0][j] == 1) {
@@ -146,14 +161,34 @@ class Game {
     }
     return false;
   }
+  // 游戏结束停止运行
   stop() {
     clearInterval(this.timer);
     this.timer = null;
     console.log('game over')
   }
+  run() {
+    let timeCount = 0;
+    this.timer = setInterval(() => {
+      this.autoRun();
+      timeCount ++;
+      if(timeCount == 5) {
+        timeCount = 0;
+        this.timeCount ++;
+        this.setTime();
+      }
+    }, 200)
+  }
+  setTime() {
+    this.timeDiv.innerHTML = this.timeCount
+  }
+  setScore(score) {
+    this.score += score;
+    this.scoreDiv.innerHTML = this.score
+  }
   // 刷新当前方块和下一个方块
   performNext() {
-    this.gameController.clearData(this.cur, this.gameData)
+    // this.gameController.clearData(this.cur, this.gameData)
     this.cur = this.next || this.squareFactory.makeSquare();
     this.next = this.squareFactory.makeSquare();
 
@@ -165,21 +200,25 @@ class Game {
   }
   // 游戏初始化
   init(doms) {
+
+    this.timeDiv = doms.timeDiv;
+    this.scoreDiv = doms.scoreDiv;
+
     this.squareFactory = new SquareFactory();
     this.gameController = new GameController();
 
     // this.performNext();
-    this.cur = this.squareFactory.makeSquare();
-    this.next = this.squareFactory.makeSquare();
+    // this.cur = this.squareFactory.makeSquare();
+    // this.next = this.squareFactory.makeSquare();
 
     this.initDiv(this.gameDivs, this.gameData, doms.gameDiv);
-    this.initDiv(this.nextDivs, this.next.data, doms.nextDiv);
+    this.initDiv(this.nextDivs, this.squareFactory.makeSquare().data, doms.nextDiv);
 
     this.performNext();
-
-    this.timer = setInterval(() => {
-      this.autoRun();
-    }, 200)
+    this.run();
+    // this.timer = setInterval(() => {
+    //   this.autoRun();
+    // }, 200)
   }
 }
 export default Game

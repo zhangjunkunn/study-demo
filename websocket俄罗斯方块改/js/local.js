@@ -3,7 +3,9 @@ class Local {
   constructor() {
     this.doms = {
       gameDiv: document.getElementById('game'),
-      nextDiv: document.getElementById('next')
+      nextDiv: document.getElementById('next'),
+      timeDiv: document.getElementById('time'),
+      scoreDiv: document.getElementById('score')
     }
     this.game = null;
   }
@@ -27,6 +29,9 @@ class Local {
           break;
       }
     }
+    // document.getElementById('pausle').onclick = e => {
+    //   this.game.stop()
+    // }
   }
   start() {
     this.bindKeyEvent();

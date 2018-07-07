@@ -124,7 +124,7 @@ class GameController {
         next.data[i][j] = next.rotate[next.dir][i][j];
       }
     }
-    this.setData(cur, gameData);
+    // this.setData(cur, gameData);
   }
   fixed(cur, gameData) {
     for (let i = 0; i < cur.data.length; i++) {
