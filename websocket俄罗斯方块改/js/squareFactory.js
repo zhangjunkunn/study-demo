@@ -199,7 +199,7 @@ class SquareFactory {
   makeSquare() {
     let type = Math.floor(Math.random() * 7);
     let dir = Math.floor(Math.random() * 4);
-    return new Square(datas[type], rotates[type], dir);
+    return new Square(JSON.parse(JSON.stringify(rotates[type][dir])), rotates[type], dir);
   }
 }
 export default SquareFactory

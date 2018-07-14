@@ -33,6 +33,8 @@ class Game {
     this.gameController = null;
     this.squareFactory = null;
     this.timer = null;
+    this.gameDiv = null;
+    this.nextDiv = null;
     this.timeDiv = null;
     this.scoreDiv = null;
     this.timeCount = 0;
@@ -167,6 +169,7 @@ class Game {
     this.timer = null;
     console.log('game over')
   }
+  // 定时运行
   run() {
     let timeCount = 0;
     this.timer = setInterval(() => {
@@ -175,50 +178,76 @@ class Game {
       if(timeCount == 5) {
         timeCount = 0;
         this.timeCount ++;
+        if (this.timeCount % 5 == 0) {
+          console.log('add line')
+          this.addLine(this.genLines(1))
+        }
         this.setTime();
       }
+      
     }, 200)
   }
+  // 设置游戏时间
   setTime() {
     this.timeDiv.innerHTML = this.timeCount
   }
+  // 设置分数
   setScore(score) {
     this.score += score;
     this.scoreDiv.innerHTML = this.score
   }
   // 刷新当前方块和下一个方块
   performNext() {
-    // this.gameController.clearData(this.cur, this.gameData)
+    this.cur && this.gameController.clearData(this.cur, this.gameData)
     this.cur = this.next || this.squareFactory.makeSquare();
     this.next = this.squareFactory.makeSquare();
 
-    this.gameController.initRotate(this.cur, this.next, this.gameData);
     this.gameController.setData(this.cur, this.gameData);
 
     this.refreshDiv(this.gameDivs, this.gameData);
     this.refreshDiv(this.nextDivs, this.next.data);
   }
+  // 增加行
+  addLine(lines) {
+    console.log('clear data before addline')
+    // this.gameController.clearData(this.cur, this.gameData)
+    for(let i = 0; i < this.gameData.length - lines.length; i ++) {
+      this.gameData[i] = this.gameData[i + lines.length];
+    }
+    for(let i = 0; i < lines.length; i ++) {
+      this.gameData[this.gameData.length - lines.length + i] = lines[i];
+    }
+    (this.cur.origin.x >= lines.length) && (this.cur.origin.x -= lines.length);
+    this.refreshDiv(this.gameDivs, this.gameData);
+  }
+  // 生成增加的行
+  genLines(lineNum) {
+    let lines = [];
+    for(let i = 0; i < lineNum; i ++) {
+      let lineData = [];
+      for(let j = 0; j < this.gameData[0].length; j ++) {
+        lineData.push(Math.floor(Math.random() * 2));
+      }
+      lines.push(lineData);
+    }
+    return lines
+  }
   // 游戏初始化
   init(doms) {
 
+    this.gameDiv = doms.gameDiv;
+    this.nextDiv = doms.nextDiv;
     this.timeDiv = doms.timeDiv;
     this.scoreDiv = doms.scoreDiv;
 
     this.squareFactory = new SquareFactory();
     this.gameController = new GameController();
 
-    // this.performNext();
-    // this.cur = this.squareFactory.makeSquare();
-    // this.next = this.squareFactory.makeSquare();
-
-    this.initDiv(this.gameDivs, this.gameData, doms.gameDiv);
-    this.initDiv(this.nextDivs, this.squareFactory.makeSquare().data, doms.nextDiv);
+    this.initDiv(this.gameDivs, this.gameData, this.gameDiv);
+    this.initDiv(this.nextDivs, this.squareFactory.makeSquare().data, this.nextDiv);
 
     this.performNext();
     this.run();
-    // this.timer = setInterval(() => {
-    //   this.autoRun();
-    // }, 200)
   }
 }
 export default Game
